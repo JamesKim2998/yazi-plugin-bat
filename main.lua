@@ -20,10 +20,6 @@ function M:peek(job)
         :stderr(Command.PIPED)
         :spawn()
 
-    if not child then
-        return
-    end
-
     local max_lines = job.area.h
     local collected_lines = ""
     local i = 0
@@ -59,7 +55,11 @@ function M:peek(job)
     local processed_text = collected_lines:gsub("\t", string.rep(" ", (rt and rt.preview or PREVIEW).tab_size))
 
     -- Create text widget with proper wrapping
-    ya.preview_widget(job, ui.Text.parse(processed_text):area(job.area):wrap(is_wrap and ui.Text.WRAP or ui.Text.WRAP_NO))
+    local widget = ui.Text.parse(processed_text):area(job.area)
+    if is_wrap then
+        widget = widget:wrap(ui.Text.WRAP)
+    end
+    ya.preview_widget(job, widget)
 end
 
 function M:seek(job)
